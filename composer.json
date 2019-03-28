@@ -1,0 +1,36 @@
+{
+  "name": "kanti/letsencrypt-client",
+  "license": "MIT",
+  "config": {
+    "platform": {
+      "php": "7.2"
+    },
+    "sort-packages": true,
+    "optimize-autoloader": true,
+    "process-timeout": 0
+  },
+  "scripts": {
+    "test": "./vendor/bin/phpunit tests",
+    "test:watch": "./vendor/bin/phpunit-watcher watch tests"
+  },
+  "require": {
+    "php": "7.2.*",
+    "thecodingmachine/safe": "^0.1.14",
+    "ext-yaml": "*",
+    "ext-curl": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Kanti\\LetsencryptClient\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Kanti\\LetsencryptClient\\Tests\\": "tests"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^8.1",
+    "spatie/phpunit-watcher": "^1.8"
+  }
+}

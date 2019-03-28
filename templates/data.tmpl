@@ -1,0 +1,6 @@
+[
+{{ range $project, $containers := groupByLabel $ "com.docker.compose.project" }}
+  {{ range $container := $containers }}{{if $container.Env.VIRTUAL_HOST}}{{ json $container.Env.VIRTUAL_HOST}},{{end}}{{end}}
+{{end}}
+null
+]
