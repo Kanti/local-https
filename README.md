@@ -1,4 +1,4 @@
-# LOCAL real HTTPS. With the help of Cloudflare
+# LOCAL real HTTPS. With the help of Cloudflare DNS
 
 You want a local Https certificate that is real. Accepted by every Browser?
 With your domain and a little help of Docker you can do it.
@@ -37,11 +37,11 @@ services:
 
 Create `.env` file:
 ````.env
-#needed
+# required:
 HTTPS_MAIN_DOMAIN=your.tld
 DNS_CLOUDFLARE_EMAIL=cloudflare@yourmail
 DNS_CLOUDFLARE_API_KEY=0123456789abcdefghijklmnopqrstuvwxyz
 
-# not needed:
+# optional:
 SLACK_TOKEN=111111111/222222222/333333333333333333333333
 ````
