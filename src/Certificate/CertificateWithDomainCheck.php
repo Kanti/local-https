@@ -6,7 +6,7 @@ namespace Kanti\LetsencryptClient\Certificate;
 use DateTimeImmutable;
 use function Safe\sprintf;
 
-final class SelfSignedCertificateWithDomainCheck
+final class CertificateWithDomainCheck
 {
     /**@var string */
     private $certPathAndName;
