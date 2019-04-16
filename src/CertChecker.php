@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Kanti\LetsencryptClient;
 
 use Kanti\LetsencryptClient\Certificate\LetsEncryptCertificate;
-use Kanti\LetsencryptClient\Certificate\SelfSignedCertificateWithDomainCheck;
+use Kanti\LetsencryptClient\Certificate\CertificateWithDomainCheck;
 
 /**
  * combine all HTTPS domains per docker-compose.yml
@@ -36,7 +36,7 @@ final class CertChecker
     {
         $this->invalidDomains = [];
         foreach ($domains as $domain) {
-            $cert = new SelfSignedCertificateWithDomainCheck('/etc/nginx/certs/' . $domain, [$domain]);
+            $cert = new CertificateWithDomainCheck('/etc/nginx/certs/' . $domain, [$domain]);
             if (!$cert->areAllDomainsValid()) {
                 $domains = $cert->getInvalidDomains();
                 array_push($this->invalidDomains, ...$domains);

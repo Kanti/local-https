@@ -14,9 +14,9 @@ final class LetsEncryptCertificate
     /** @var array<int, string> */
     private $domains;
     /** @var string */
-    private $keyPath;
-    /** @var string */
     private $crtPath;
+    /** @var string */
+    private $keyPath;
 
     public function __construct(array $domains)
     {
@@ -37,7 +37,7 @@ final class LetsEncryptCertificate
                 $containedDomains = explode(' ', $certInfo['Domains']);
                 sort($containedDomains);
                 if ($containedDomains === $this->domains) {
-                    $this->crtPath = str_replace('fullchain.pem', 'cert.pem', $certInfo['Certificate Path']);
+                    $this->crtPath = $certInfo['Certificate Path'];
                     $this->keyPath = $certInfo['Private Key Path'];
                     break;
                 }
