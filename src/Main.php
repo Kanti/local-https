@@ -29,7 +29,7 @@ final class Main
         $domains = $dataJsonReader->getDomains();
         $certChecker = new CertChecker();
         if ($certChecker->createIfNotExists($domains)) {
-            $this->nginxProxy->reload();
+            $this->nginxProxy->restart();
         }
     }
 
@@ -72,7 +72,7 @@ final class Main
                 'username' => 'localHttps',
                 'text' => sprintf(':selfie: CERTIFICATE self signed created %s.', $mainDomain),
             ]);
-            $this->nginxProxy->reload();
+            $this->nginxProxy->restart();
         }
     }
 }

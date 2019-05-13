@@ -17,13 +17,13 @@ final class NginxProxy
         $this->getDockerGenContainer();
     }
 
-    public function reload(): void
+    public function restart(): void
     {
         $result = shell_exec(sprintf(
-            "docker exec -it %s sh -c '/app/docker-entrypoint.sh /usr/local/bin/docker-gen /app/nginx.tmpl /etc/nginx/conf.d/default.conf; /usr/sbin/nginx -s reload'",
+            "docker restart %s",
             $this->getDockerGenContainer()
         ));
-        echo $result . PHP_EOL . 'Nginx Reloaded.' . PHP_EOL;
+        echo $result . PHP_EOL . 'Nginx Restarted.' . PHP_EOL;
     }
 
     private function getDockerGenContainer(): string
