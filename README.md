@@ -21,7 +21,7 @@ services:
       - com.github.kanti.local_https.nginx_proxy=true
 
   companion:
-    build: .
+    image: kanti/local-https
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./.docker/data/letsencrypt:/etc/letsencrypt
