@@ -17,8 +17,6 @@ services:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ./.docker/data/nginx/certs:/etc/nginx/certs
       - ./.docker/data/nginx/dhparam:/etc/nginx/dhparam
-    environment:
-      - DHPARAM_GENERATION=false
     labels:
       - com.github.kanti.local_https.nginx_proxy=true
 
