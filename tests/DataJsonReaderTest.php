@@ -1,28 +1,28 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Kanti\LetsencryptClient\Tests;
 
 use Generator;
-use Kanti\LetsencryptClient\DataJsonReader;
+use Kanti\LetsencryptClient\Dto\DataJsonReader;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\NullOutput;
 
 class DataJsonReaderTest extends TestCase
 {
     /**
      * @dataProvider getProjectDomainsProvider
-     * @param string $httpsMainDomain
-     * @param string $dataFilePath
-     * @param array $expectedList
+     * @param array<string> $expectedList
      */
-    public function testGetProjectDomains(string $httpsMainDomain, string $dataFilePath, array $expectedList)
+    public function testGetProjectDomains(string $httpsMainDomain, string $dataFilePath, array $expectedList): void
     {
-        $dataJsonReader = new DataJsonReader($httpsMainDomain, $dataFilePath);
-        $result = $dataJsonReader->getDomains();
+        $dataJsonReader = new DataJsonReader(new NullOutput(), $httpsMainDomain, $dataFilePath);
+        $result = $dataJsonReader->getDomainLists();
         $this->assertEquals($expectedList, $result);
     }
 
-    public function getProjectDomainsProvider(): ?Generator
+    public function getProjectDomainsProvider(): Generator
     {
         yield ['kanti.dev', 'tests/fixtures/domainList.json', [
             'kanti.dev',

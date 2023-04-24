@@ -1,60 +1,73 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Kanti\LetsencryptClient\Certificate;
 
 use DateTimeImmutable;
-use function Safe\sprintf;
+use Kanti\LetsencryptClient\Utility\ProcessUtility;
+use Symfony\Component\Console\Output\OutputInterface;
+
+use function sprintf;
 
 final class SelfSignedCertificate
 {
+    /** @var string */
     private const CN_NAME = 'kanti-local-https-client';
 
-    /**@var string */
-    private $certPathAndName;
-
-    public function __construct(string $certPathAndName)
+    public function __construct(private OutputInterface $output)
     {
-        $this->certPathAndName = $certPathAndName;
     }
 
-    public function createIfNotExists(): bool
+    public function createIfNotExists(string $certPathAndName): bool
     {
-        if (!file_exists($this->certPathAndName . '.crt')) {
-            return $this->forceCreateNew();
+        $this->output->writeln(sprintf('Check SelfSignedCertificate for path %s', $certPathAndName));
+
+        if (!file_exists($certPathAndName . '.crt')) {
+            $this->output->writeln(sprintf('forceCreateNew SelfSignedCertificate %s.crt not found', $certPathAndName));
+            return $this->forceCreateNew($certPathAndName);
         }
-        if (!file_exists($this->certPathAndName . '.key')) {
-            return $this->forceCreateNew();
+
+        if (!file_exists($certPathAndName . '.key')) {
+            $this->output->writeln(sprintf('forceCreateNew SelfSignedCertificate %s.key not found', $certPathAndName));
+            return $this->forceCreateNew($certPathAndName);
         }
-        if (!$this->certIsValid()) {
-            return $this->forceCreateNew();
+
+        if (!$this->certIsValid($certPathAndName)) {
+            $this->output->writeln(sprintf('forceCreateNew SelfSignedCertificate %s not valid anymore', $certPathAndName));
+            return $this->forceCreateNew($certPathAndName);
         }
+
         return false;
     }
 
-    public function forceCreateNew(): bool
+    public function forceCreateNew(string $certPathAndName): bool
     {
-        shell_exec(sprintf('openssl req -x509 \
+        ProcessUtility::runProcess(
+            sprintf(
+                'openssl req -x509 \
             -newkey rsa:4096 -sha256 -nodes -days 365 \
             -subj "/CN=%s" \
             -keyout /tmp/new.key \
             -out /tmp/new.crt \
             && mv /tmp/new.key %s \
             && mv /tmp/new.crt %s',
-            self::CN_NAME,
-            $this->certPathAndName . '.key',
-            $this->certPathAndName . '.crt'
-        ));
+                self::CN_NAME,
+                $certPathAndName . '.key',
+                $certPathAndName . '.crt'
+            )
+        );
         return true;
     }
 
-    private function certIsValid(): bool
+    private function certIsValid(string $certPathAndName): bool
     {
-        $result = shell_exec(sprintf('openssl x509 -noout -subject -in %s', $this->certPathAndName . '.crt'));
+        $result = ProcessUtility::runProcess(sprintf('openssl x509 -noout -subject -in %s', $certPathAndName . '.crt'))->getOutput();
         if (trim($result) !== sprintf('subject=CN = %s', self::CN_NAME)) {
             return false;
         }
-        $result = shell_exec(sprintf('openssl x509 -noout -enddate -in "%s" | cut -d "=" -f 2', $this->certPathAndName . '.crt'));
+
+        $result = ProcessUtility::runProcess(sprintf('openssl x509 -noout -enddate -in "%s" | cut -d "=" -f 2', $certPathAndName . '.crt'))->getOutput();
         $certDate = new DateTimeImmutable($result);
         return $certDate > new DateTimeImmutable('+3 months');
     }

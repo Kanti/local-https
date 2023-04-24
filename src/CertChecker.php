@@ -1,10 +1,15 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Kanti\LetsencryptClient;
 
-use Kanti\LetsencryptClient\Certificate\LetsEncryptCertificate;
 use Kanti\LetsencryptClient\Certificate\CertificateWithDomainCheck;
+use Kanti\LetsencryptClient\Dto\LetsEncryptCertificate;
+use Kanti\LetsencryptClient\Certificate\LetsEncryptCertificateFactory;
+use Kanti\LetsencryptClient\Dto\Domain;
+use Kanti\LetsencryptClient\Dto\DomainList;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * combine all HTTPS domains per docker-compose.yml
@@ -17,44 +22,48 @@ use Kanti\LetsencryptClient\Certificate\CertificateWithDomainCheck;
  */
 final class CertChecker
 {
-    /** @var array<int, string> */
-    private $invalidDomains = [];
+    private DomainList $invalidDomains;
 
-    public function createIfNotExists(array $domains): bool
+    public function __construct(
+        private OutputInterface $output,
+        private LetsEncryptCertificateFactory $letsEncryptCertificateFactory,
+        private CertificateWithDomainCheck $certificateWithDomainCheck,
+    ) {
+    }
+
+    public function createIfNotExists(DomainList $domainList): bool
     {
-        if (!$this->haveAllDomainsValidCertificates($domains)) {
-            $certs = $this->createCertificatesWithDomains($this->invalidDomains);
+        $this->output->writeln(sprintf('testing domains: <info>%s</info>', $domainList));
+        if (!$this->haveAllDomainsValidCertificates($domainList)) {
+            $this->output->writeln('not all are valid...');
+            $certs = $this->letsEncryptCertificateFactory->fromDomainList($this->invalidDomains, $this->output);
             foreach ($certs as $cert) {
-                $this->copyCertificateToDomains($cert, $cert->getDomains());
+                $this->copyCertificateToDomains($cert);
             }
+
             return true;
         }
+
         return false;
     }
 
-    private function haveAllDomainsValidCertificates(array $domains): bool
+    private function haveAllDomainsValidCertificates(DomainList $domainList): bool
     {
-        $this->invalidDomains = [];
-        foreach ($domains as $domain) {
-            $cert = new CertificateWithDomainCheck('/etc/nginx/certs/' . $domain, [$domain]);
-            if (!$cert->areAllDomainsValid()) {
-                $domains = $cert->getInvalidDomains();
-                array_push($this->invalidDomains, ...$domains);
+        $this->invalidDomains = new DomainList();
+        foreach ($domainList as $domain) {
+            if (!$this->certificateWithDomainCheck->checkCertificate('/etc/nginx/certs/' . $domain, $domain)) {
+                $this->invalidDomains->add($domain);
             }
         }
+
         return count($this->invalidDomains) === 0;
     }
 
-    private function createCertificatesWithDomains(array $domains): array
-    {
-        return LetsEncryptCertificate::fromDomainList($domains);
-    }
-
-    private function copyCertificateToDomains(LetsEncryptCertificate $cert, $domains): void
+    private function copyCertificateToDomains(LetsEncryptCertificate $cert): void
     {
         $crtPath = $cert->getCrtPath();
         $keyPath = $cert->getKeyPath();
-        foreach ($domains as $domain) {
+        foreach ($cert->getDomainList() as $domain) {
             copy($crtPath, '/etc/nginx/certs/' . $domain . '.crt');
             copy($keyPath, '/etc/nginx/certs/' . $domain . '.key');
         }
