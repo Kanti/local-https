@@ -31,13 +31,13 @@ final class Main
         }
     }
 
-    public function deleteReallyOldCertificates(): void
+    public function deleteOldCertificates(): void
     {
         $data = $this->letsEncryptCertificateFactory->getCurrentCertificateInformation();
         foreach ($data['Found the following certs'] ?? [] as $name => $certInfo) {
             preg_match('#(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})#', $certInfo['Expiry Date'], $matches);
             $certDate = new DateTimeImmutable($matches[0]);
-            if ($certDate < new DateTimeImmutable('-3 month')) {
+            if ($certDate < new DateTimeImmutable('-1 month')) {
                 $this->letsEncryptCertificateFactory->removeCertificate($name);
             }
         }

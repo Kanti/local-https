@@ -17,7 +17,7 @@ RUN apk add --update curl \
     && rm -rf /var/cache/apk/*
 
 #
-#
+# dev
 #
 FROM base as dev
 
@@ -45,7 +45,7 @@ ENV PATH="$PATH:./vendor/bin/"
 RUN git config --global --add safe.directory /app
 
 #
-#
+# prod
 #
 FROM base as prod
 
@@ -58,8 +58,9 @@ RUN apk add --update \
   && rm -rf /var/cache/apk/*
 
 #
+# finish
 #
-#
+
 FROM ${BUILD_STAGE} as finish
 
 COPY src /app/src
@@ -70,6 +71,9 @@ COPY script.php composer.json composer.lock /app/
 WORKDIR /app
 
 RUN composer install --no-dev -n
+
+ARG RELEASE_TAG
+ENV RELEASE_TAG=${RELEASE_TAG}
 
 ENTRYPOINT ["php", "/app/script.php", "entrypoint" , "--ansi"]
 

@@ -12,31 +12,22 @@ use function sprintf;
 
 final class NginxProxy
 {
-    private ?string $dockerGenContainer = null;
+    private string $dockerGenContainer;
 
     public function __construct(
         private OutputInterface $output,
     ) {
-        $this->getDockerGenContainer();
+        $result = ProcessUtility::runProcess('docker ps -f "label=com.github.kanti.local_https.nginx_proxy" -q')->getOutput();
+        if (!$result) {
+            throw new Exception('ERROR NginxProxy Not found. did you not set the label=com.github.kanti.local_https.nginx_proxy on jwilder/nginx-proxy');
+        }
+
+        $this->dockerGenContainer = trim($result);
     }
 
     public function restart(): void
     {
-        $result = ProcessUtility::runProcess(sprintf("docker restart %s", $this->getDockerGenContainer()))->getOutput();
+        $result = ProcessUtility::runProcess(sprintf("docker restart %s", $this->dockerGenContainer))->getOutput();
         $this->output->writeln($result . PHP_EOL . '<info>Nginx Restarted.</info>');
-    }
-
-    private function getDockerGenContainer(): string
-    {
-        if ($this->dockerGenContainer === null) {
-            $result = ProcessUtility::runProcess('docker ps -f "label=com.github.kanti.local_https.nginx_proxy" -q')->getOutput();
-            if (!$result) {
-                throw new Exception('ERROR NginxProxy Not found. did you not set the label=com.github.kanti.local_https.nginx_proxy on jwilder/nginx-proxy');
-            }
-
-            $this->dockerGenContainer = trim($result);
-        }
-
-        return $this->dockerGenContainer;
     }
 }

@@ -19,7 +19,7 @@ final class CertificateWithDomainCheck
 
     public function checkCertificate(string $certPathAndName, Domain $domain): bool
     {
-        $this->output->writeln(sprintf('Testing Certificate for <info>%s</info>', $domain));
+        $this->output->writeln(sprintf('Testing Certificate for <fg=magenta>%s</>', $domain));
 
         if (!file_exists($certPathAndName . '.crt')) {
             $this->output->writeln(sprintf('file not found %s' . PHP_EOL, $certPathAndName . '.crt'));

@@ -27,7 +27,7 @@ class EntrypointCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<info>entrypoint start...</info>');
-        $this->main->deleteReallyOldCertificates();
+        $this->main->deleteOldCertificates();
         $this->main->createIfNotExistsDefaultCertificate();
 
         $email = ConfigUtility::getEnv('DNS_CLOUDFLARE_EMAIL');

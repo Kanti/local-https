@@ -33,13 +33,10 @@ final class CertChecker
 
     public function createIfNotExists(DomainList $domainList): bool
     {
-        $this->output->writeln(sprintf('testing domains: <info>%s</info>', $domainList));
+        $this->output->writeln(sprintf('testing domains: <fg=yellow>%s</>', $domainList));
         if (!$this->haveAllDomainsValidCertificates($domainList)) {
             $this->output->writeln('not all are valid...');
-            $certs = $this->letsEncryptCertificateFactory->fromDomainList($this->invalidDomains, $this->output);
-            foreach ($certs as $cert) {
-                $this->copyCertificateToDomains($cert);
-            }
+            $this->letsEncryptCertificateFactory->createFromDomainList($this->invalidDomains);
 
             return true;
         }
@@ -57,15 +54,5 @@ final class CertChecker
         }
 
         return count($this->invalidDomains) === 0;
-    }
-
-    private function copyCertificateToDomains(LetsEncryptCertificate $cert): void
-    {
-        $crtPath = $cert->getCrtPath();
-        $keyPath = $cert->getKeyPath();
-        foreach ($cert->getDomainList() as $domain) {
-            copy($crtPath, '/etc/nginx/certs/' . $domain . '.crt');
-            copy($keyPath, '/etc/nginx/certs/' . $domain . '.key');
-        }
     }
 }

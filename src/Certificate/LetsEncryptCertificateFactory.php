@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use Kanti\LetsencryptClient\Dto\DomainList;
 use Kanti\LetsencryptClient\Dto\LetsEncryptCertificate;
 use Kanti\LetsencryptClient\Exception\CertbotException;
+use Kanti\LetsencryptClient\NginxProxy;
 use Kanti\LetsencryptClient\SlackNotification;
 use Kanti\LetsencryptClient\Utility\ProcessUtility;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,7 +20,7 @@ use function sprintf;
 
 final class LetsEncryptCertificateFactory
 {
-    public function __construct(private OutputInterface $output, private SlackNotification $slackNotification)
+    public function __construct(private OutputInterface $output, private SlackNotification $slackNotification, private NginxProxy $nginxProxy)
     {
     }
 
@@ -37,13 +38,15 @@ final class LetsEncryptCertificateFactory
             throw new CertbotException(sprintf('This should never happen, cert got not created? domains: %s', $domainList), 0, $processFailedException);
         }
 
-        $this->notifyUser($result, $domainList);
         $data = $this->getCurrentCertificateInformation();
         foreach ($data['Found the following certs'] ?? [] as $certInfo) {
             if (!str_contains($certInfo['Expiry Date'], 'INVALID TEST_CERT')) {
                 $containedDomains = DomainList::fromCommaString($certInfo['Domains']);
                 if ((string)$containedDomains === (string)$domainList) {
-                    return new LetsEncryptCertificate($certInfo['Certificate Path'], $certInfo['Private Key Path'], $domainList);
+                    $letsEncryptCertificate = new LetsEncryptCertificate($certInfo['Certificate Path'], $certInfo['Private Key Path'], $domainList);
+                    $this->copyCertificateToDomains($letsEncryptCertificate);
+                    $this->notifyUser($result, $domainList);
+                    return $letsEncryptCertificate;
                 }
             }
         }
@@ -51,10 +54,19 @@ final class LetsEncryptCertificateFactory
         throw new CertbotException(sprintf('This should never happen, cert got not created? domains: %s', $domainList));
     }
 
-    /**
-     * @return array<LetsEncryptCertificate>
-     */
-    public function fromDomainList(DomainList $domainList, OutputInterface $output): array
+    private function copyCertificateToDomains(LetsEncryptCertificate $cert): void
+    {
+        $crtPath = $cert->getCrtPath();
+        $keyPath = $cert->getKeyPath();
+        foreach ($cert->getDomainList() as $domain) {
+            copy($crtPath, '/etc/nginx/certs/' . $domain . '.crt');
+            copy($keyPath, '/etc/nginx/certs/' . $domain . '.key');
+        }
+
+        $this->nginxProxy->restart();
+    }
+
+    public function createFromDomainList(DomainList $domainList): void
     {
         $data = $this->getCurrentCertificateInformation();
         $renewOrUseCertificates = [];
@@ -74,18 +86,15 @@ final class LetsEncryptCertificateFactory
             }
         }
 
-        $result = [];
         foreach (array_keys($renewOrUseCertificates) as $key) {
-            $result[] = $this->create(DomainList::fromCommaString($key));
+            $this->create(DomainList::fromCommaString($key));
         }
 
         if (count($remainingDomains)) {
             foreach (array_chunk($remainingDomains->toArray(), 50) as $chunkedTestDomains) {
-                $result[] = $this->create(new DomainList(...$chunkedTestDomains));
+                $this->create(new DomainList(...$chunkedTestDomains));
             }
         }
-
-        return $result;
     }
 
     public function getCurrentCertificateInformation(): mixed

@@ -60,3 +60,4 @@ jobs:
           tags: ghcr.io/kanti/local-https:alpha,kanti/local-https:alpha
           build-args: |
             STAGE=prod
+            RELEASE_TAG=${{ github.sha }}
