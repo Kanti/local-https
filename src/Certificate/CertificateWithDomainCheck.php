@@ -19,6 +19,7 @@ final class CertificateWithDomainCheck
 
     public function checkCertificate(string $certPathAndName, Domain $domain): bool
     {
+        $certPathAndName = rtrim($certPathAndName, '.crt');
         $this->output->writeln(sprintf('Testing Certificate for <fg=magenta>%s</>', $domain));
 
         if (!file_exists($certPathAndName . '.crt')) {
@@ -58,6 +59,11 @@ final class CertificateWithDomainCheck
         $acceptedDomains[] = $acceptedDomain;
         if (!in_array((string)$domain, $acceptedDomains, true)) {
             $this->output->writeln(sprintf('Domain %s is not in the list of Acceptable Domains: %s', (string)$domain, implode(',', $acceptedDomains)));
+            return false;
+        }
+
+        if (!in_array('*.' . $domain, $acceptedDomains, true)) {
+            $this->output->writeln(sprintf('Domain *.%s is not in the list of Acceptable Domains: %s', (string)$domain, implode(',', $acceptedDomains)));
             return false;
         }
 

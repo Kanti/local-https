@@ -8,6 +8,8 @@ use Countable;
 use IteratorAggregate;
 use Traversable;
 
+use function Clue\StreamFilter\fun;
+
 /**
  * @implements IteratorAggregate<Domain>
  */
@@ -21,11 +23,7 @@ class DomainList implements IteratorAggregate, Countable, Stringable
     public function __construct(Domain ...$domains)
     {
         $this->domains = array_unique($domains);
-    }
-
-    public function add(Domain $domain): void
-    {
-        $this->domains[] = $domain;
+        $this->sort();
     }
 
     /**
@@ -51,7 +49,8 @@ class DomainList implements IteratorAggregate, Countable, Stringable
 
     public function sort(): self
     {
-        sort($this->domains);
+        usort($this->domains, static fn($a, $b): int => strlen($a) <=> strlen($b));
+        usort($this->domains, static fn($a, $b): int => substr_count($a, '.') <=> substr_count($b, '.'));
         return $this;
     }
 
@@ -60,10 +59,32 @@ class DomainList implements IteratorAggregate, Countable, Stringable
         return implode(',', $this->domains);
     }
 
-    public static function fromCommaString(string $commaString): DomainList
+    /**
+     * @param array<string> $domainStrings
+     */
+    public static function fromArray(array $domainStrings): DomainList
     {
-        $domainStrings = array_filter(explode(',', $commaString));
         $domains = array_map(static fn($domain): Domain => new Domain($domain), $domainStrings);
         return (new self(...$domains))->sort();
+    }
+
+    public function getWildCardDomainList(): DomainList
+    {
+        $result = [];
+
+        foreach ($this as $domain) {
+            $domainParts = explode('.', (string)$domain);
+            $currentDomainLevel = array_pop($domainParts); //pop top 2 levels (andersundsehr.com should not be getting a wildcard)
+            $pop = array_pop($domainParts);
+            $currentDomainLevel = $pop . '.' . $currentDomainLevel;
+
+            do {
+                $pop = array_pop($domainParts);
+                $currentDomainLevel = $pop . '.' . $currentDomainLevel;
+                $result[] = $currentDomainLevel;
+            } while (count($domainParts) > 1);
+        }
+
+        return self::fromArray($result);
     }
 }

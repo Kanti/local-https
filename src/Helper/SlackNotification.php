@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kanti\LetsencryptClient;
+namespace Kanti\LetsencryptClient\Helper;
 
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

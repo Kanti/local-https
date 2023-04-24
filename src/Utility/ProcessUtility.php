@@ -11,21 +11,21 @@ class ProcessUtility
 {
     public static function runProcess(string $cmd): Process
     {
-        $output = Application::$container->get(OutputInterface::class);
-        assert($output instanceof OutputInterface);
-        $output->write(sprintf('running command <info>%s </info>...', $cmd));
+        $containerBuilder = Application::$container ?? null;
+        $output = $containerBuilder?->get(OutputInterface::class);
+        $output?->write(sprintf('running command <info>%s </info>...', $cmd));
 
         $process = Process::fromShellCommandline($cmd);
         $process->run();
 
-        $output->writeln(sprintf('...done (%s)', $process->getExitCodeText()));
+        $output?->writeln(sprintf('...done (%s)', $process->getExitCodeText()));
 
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }
 
-        $output->write(sprintf('<fg=red>%s</>', $process->getErrorOutput()));
-        $output->write(sprintf('<options=bold>%s</>', $process->getOutput()));
+        $output?->write(sprintf('<fg=red>%s</>', $process->getErrorOutput()));
+        $output?->write(sprintf('<options=bold>%s</>', $process->getOutput()));
         return $process;
     }
 }

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Kanti\LetsencryptClient\Dto;
 
-final class LetsEncryptCertificate
+final class WildCardCert
 {
-    public function __construct(private string $crtPath, private string $keyPath, private DomainList $domainList)
+    public function __construct(private string $crtPath, private string $keyPath, private Domain $domain)
     {
     }
 
@@ -20,8 +20,8 @@ final class LetsEncryptCertificate
         return $this->keyPath;
     }
 
-    public function getDomainList(): DomainList
+    public function getDomain(): Domain
     {
-        return $this->domainList;
+        return $this->domain;
     }
 }

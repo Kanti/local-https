@@ -3,7 +3,7 @@
 namespace Kanti\LetsencryptClient;
 
 use Throwable;
-use Kanti\LetsencryptClient\Certificate\LetsEncryptCertificateFactory;
+use Kanti\LetsencryptClient\Certificate\CertbotHelper;
 use Kanti\LetsencryptClient\Command\EntrypointCommand;
 use Kanti\LetsencryptClient\Command\ListDomainsCommand;
 use Kanti\LetsencryptClient\Command\NotifyCommand;
@@ -49,6 +49,7 @@ class Application extends SymfonyApplication
 
         $input = new ArgvInput();
         $output = new ConsoleOutput();
+        $output->setDecorated(true);
 
         $container->register(InputInterface::class, ArgvInput::class)->setSynthetic(true);
         $container->register(OutputInterface::class, ConsoleOutput::class)->setSynthetic(true);
@@ -62,6 +63,7 @@ class Application extends SymfonyApplication
 
         $this->add($container->get(EntrypointCommand::class));
         $this->add($container->get(NotifyCommand::class));
+        $this->setDefaultCommand('notify');
 
         $this->setCatchExceptions(false);
         try {

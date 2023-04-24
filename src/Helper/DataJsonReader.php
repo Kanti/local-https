@@ -17,10 +17,7 @@ final class DataJsonReader
     {
     }
 
-    /**
-     * @return array<DomainList>
-     */
-    public function getDomainLists(string $httpsMainDomain, string $dataFilePath): array
+    public function getDomainList(Domain $httpsMainDomain, string $dataFilePath): DomainList
     {
         $string = file_get_contents($dataFilePath);
         $data = json_decode($string, true, 512, JSON_THROW_ON_ERROR);
@@ -28,42 +25,34 @@ final class DataJsonReader
     }
 
     /**
-     * @param array<int, array<int, string>|null> $data
-     * @return array<DomainList>
+     * @param array<int, string|null> $data
      */
-    private function convertToDomainLists(array $data, string $httpsMainDomain): array
+    private function convertToDomainLists(array $data, Domain $httpsMainDomain): DomainList
     {
-        $domainLists = [];
-        foreach (array_filter($data) as $domainArray) {
-            $result = [];
-            foreach (array_filter($domainArray) as $domain) {
-                foreach (array_filter(explode(',', $domain)) as $singleDomain) {
-                    if ($this->isValidDomain($singleDomain, $httpsMainDomain)) {
-                        $result[] = new Domain($singleDomain);
-                    } else {
-                        $this->output->writeln(sprintf("<comment>Warning</comment> <options=bold>%s</> is not a valid domain", $singleDomain));
-                    }
+        $result = [];
+        foreach (array_filter($data) as $virtualHosts) {
+            foreach (array_filter(explode(',', $virtualHosts)) as $singleDomain) {
+                if ($this->isValidDomain($singleDomain, $httpsMainDomain)) {
+                    $result[] = new Domain($singleDomain);
+                } else {
+                    $this->output->writeln(sprintf("<comment>Warning</comment> <options=bold>%s</> is not a valid domain", $singleDomain));
                 }
-            }
-
-            if ($result) {
-                $domainLists[] = new DomainList(...$result);
             }
         }
 
-        return $domainLists;
+        return new DomainList(...$result);
     }
 
     /**
      * Domains are invalid if they start with ~
      * ... then they are Regular Expressions.
      */
-    private function isValidDomain(string $domains, string $httpsMainDomain): bool
+    private function isValidDomain(string $domains, Domain $httpsMainDomain): bool
     {
         if (str_starts_with($domains, '~')) {
             return false;
         }
 
-        return str_ends_with($domains, $httpsMainDomain);
+        return str_ends_with($domains, (string)$httpsMainDomain);
     }
 }

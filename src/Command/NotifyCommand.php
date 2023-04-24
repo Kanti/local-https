@@ -2,11 +2,14 @@
 
 namespace Kanti\LetsencryptClient\Command;
 
-use Kanti\LetsencryptClient\CertChecker;
+use Kanti\LetsencryptClient\Certificate\CertChecker;
+use Kanti\LetsencryptClient\Dto\Domain;
+use Kanti\LetsencryptClient\Dto\LetsEncryptCertificate;
+use Kanti\LetsencryptClient\Helper\WildCardHelper;
 use Kanti\LetsencryptClient\Utility\ConfigUtility;
 use Kanti\LetsencryptClient\Helper\DataJsonReader;
-use Kanti\LetsencryptClient\Main;
-use Kanti\LetsencryptClient\NginxProxy;
+use Kanti\LetsencryptClient\Helper\CleanupHelper;
+use Kanti\LetsencryptClient\Helper\NginxProxy;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,9 +23,9 @@ class NotifyCommand extends Command
 {
     public function __construct(
         private NginxProxy $nginxProxy,
-        private Main $main,
-        private CertChecker $certChecker,
-        private DataJsonReader $dataJsonReader
+        private CleanupHelper $cleanupHelper,
+        private DataJsonReader $dataJsonReader,
+        private WildCardHelper $wildCardHelper
     ) {
         parent::__construct();
     }
@@ -36,14 +39,20 @@ class NotifyCommand extends Command
         }
 
         $output->writeln('<info>notify start...</info>');
-        $this->main->deleteOldCertificates();
-        $this->main->createIfNotExistsDefaultCertificate();
 
-        $mainDomain = ConfigUtility::getEnv('HTTPS_MAIN_DOMAIN');
-        $domainLists = $this->dataJsonReader->getDomainLists($mainDomain, 'var/data.json');
-        foreach ($domainLists as $domainList) {
-            if ($this->certChecker->createIfNotExists($domainList)) {
-                $this->nginxProxy->restart();
+        $mainDomain = new Domain(ConfigUtility::getEnv('HTTPS_MAIN_DOMAIN'));
+
+        $this->cleanupHelper->deleteInvalidCertificatesInNginxDir($mainDomain);
+        $this->cleanupHelper->deleteOldCertificatesFromCertbot();
+
+        $domainLists = $this->dataJsonReader->getDomainList($mainDomain, 'var/data.json');
+
+        foreach ($domainLists->getWildCardDomainList() as $domain) {
+            $wildCardCert = $this->wildCardHelper->createOrUpdate($domain);
+            if ($wildCardCert) {
+                $this->nginxProxy
+                    ->copyToLocation($wildCardCert)
+                    ->restart();
             }
         }
 

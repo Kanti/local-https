@@ -66,17 +66,17 @@ FROM ${BUILD_STAGE} as finish
 COPY src /app/src
 COPY templates /app/templates
 COPY config /app/config
-COPY script.php composer.json composer.lock /app/
+COPY s composer.json composer.lock /app/
 
 WORKDIR /app
 
-RUN composer install --no-dev -n
+RUN composer install --no-dev -n && chmod +x /app/s
 
 ARG RELEASE_TAG
 ENV RELEASE_TAG=${RELEASE_TAG}
 
-ENTRYPOINT ["php", "/app/script.php", "entrypoint" , "--ansi"]
+ENTRYPOINT ["/app/s", "entrypoint"]
 
-CMD ["docker-gen --watch --interval 60 --wait 2s --notify-output --notify 'php /app/script.php notify --ansi'  templates/data.tmpl var/data.json"]
+CMD ["docker-gen --watch --interval 60 --notify-output --notify './s'  templates/data.tmpl var/data.json"]
 
 
