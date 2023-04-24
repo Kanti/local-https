@@ -14,8 +14,8 @@ use Kanti\LetsencryptClient\Utility\ProcessUtility;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
-use function Amp\Parallel\Worker\create;
 use function in_array;
+use function Sentry\captureMessage;
 use function sprintf;
 
 final class LetsEncryptCertificateFactory
@@ -35,13 +35,14 @@ final class LetsEncryptCertificateFactory
         try {
             $result = ProcessUtility::runProcess($cmd)->getOutput();
         } catch (ProcessFailedException $processFailedException) {
-            throw new CertbotException(sprintf('This should never happen, cert got not created? domains: %s', $domainList), 0, $processFailedException);
+            throw new CertbotException(sprintf('This should never happen, cert got not created? (process error) domains: %s', $domainList), 0, $processFailedException);
         }
 
         $data = $this->getCurrentCertificateInformation();
         foreach ($data['Found the following certs'] ?? [] as $certInfo) {
             if (!str_contains($certInfo['Expiry Date'], 'INVALID TEST_CERT')) {
-                $containedDomains = DomainList::fromCommaString($certInfo['Domains']);
+                $containedDomains = DomainList::fromCommaString(str_replace(' ', ',', $certInfo['Domains']));
+                $containedDomains->sort();
                 if ((string)$containedDomains === (string)$domainList) {
                     $letsEncryptCertificate = new LetsEncryptCertificate($certInfo['Certificate Path'], $certInfo['Private Key Path'], $domainList);
                     $this->copyCertificateToDomains($letsEncryptCertificate);
@@ -51,7 +52,7 @@ final class LetsEncryptCertificateFactory
             }
         }
 
-        throw new CertbotException(sprintf('This should never happen, cert got not created? domains: %s', $domainList));
+        throw new CertbotException(sprintf('This should never happen, cert got not created? (cert check error) domains: %s', $domainList));
     }
 
     private function copyCertificateToDomains(LetsEncryptCertificate $cert): void
@@ -128,15 +129,23 @@ final class LetsEncryptCertificateFactory
     private function notifyUser(string $result, DomainList $domainList): void
     {
         $hrefLinks = implode(PHP_EOL, array_map(static fn($domain): string => 'https://' . $domain, $domainList->toArray()));
-        if (str_contains($result, 'Certificate not yet due for renewal; no action taken.')) {
+        if (str_contains($result, 'Certificate not yet due for renewal')) {
             $this->output->writeln(sprintf('Certificate for %s is still valid.', $domainList));
             $this->slackNotification->sendNotification(':white_circle:CERTIFICATE is still valid for:' . PHP_EOL . $hrefLinks);
-        } elseif (str_contains($result, 'Congratulations! Your certificate and chain have been saved at:')) {
+            return;
+        }
+
+        if (str_contains($result, 'Requesting a certificate for:')) {
             $this->output->writeln(sprintf('Certificate for %s created.', $domainList));
             $this->slackNotification->sendNotification(':new:CERTIFICATE created for:' . PHP_EOL . $hrefLinks);
-        } else {
+            return;
+        }
+
+        if (str_contains($result, 'Renewing an existing certificate for')) {
             $this->output->writeln(sprintf('Certificate for %s renewed.', $domainList));
             $this->slackNotification->sendNotification(':recycle:CERTIFICATE renewed for:' . PHP_EOL . $hrefLinks);
         }
+
+        captureMessage('notifyUser without specific message' . PHP_EOL .  $result);
     }
 }
