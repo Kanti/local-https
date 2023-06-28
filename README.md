@@ -1,6 +1,6 @@
 # LOCAL real HTTPS. With the help of Cloudflare DNS
 
-You want a local Https certificate that is real. Accepted by every Browser?
+You want a local Https certificate that is real? Accepted by every Browser?
 With your domain and a little help of Docker you can do it.
 
 ````yml
@@ -17,13 +17,12 @@ services:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ./.docker/data/nginx/certs:/etc/nginx/certs
       - ./.docker/data/nginx/dhparam:/etc/nginx/dhparam
-    environment:
-      - DHPARAM_GENERATION=false
     labels:
       - com.github.kanti.local_https.nginx_proxy=true
 
   companion:
-    build: .
+    restart: always
+    image: kanti/local-https
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./.docker/data/letsencrypt:/etc/letsencrypt
@@ -35,7 +34,7 @@ services:
       - SLACK_TOKEN=${SLACK_TOKEN:-}
 ````
 
-Create `.env` file:
+Create a `.env` file:
 ````.env
 # required:
 HTTPS_MAIN_DOMAIN=your.tld
