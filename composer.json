@@ -1,23 +1,27 @@
 {
   "name": "kanti/letsencrypt-client",
   "license": "MIT",
-  "config": {
-    "platform": {
-      "php": "7.2"
-    },
-    "sort-packages": true,
-    "optimize-autoloader": true,
-    "process-timeout": 0
-  },
-  "scripts": {
-    "test": "./vendor/bin/phpunit tests",
-    "test:watch": "./vendor/bin/phpunit-watcher watch tests"
-  },
+  "type": "project",
   "require": {
-    "php": "7.2.*",
-    "thecodingmachine/safe": "^0.1.14",
+    "php": "8.0.*",
+    "ext-curl": "*",
     "ext-yaml": "*",
-    "ext-curl": "*"
+    "sentry/sdk": "^3.5",
+    "symfony/config": "^5.4.21",
+    "symfony/console": "^5.4.24",
+    "symfony/dependency-injection": "^5.4.25",
+    "symfony/error-handler": "^5.4.24",
+    "symfony/finder": "^5.4.21",
+    "symfony/lock": "^5.4.25",
+    "symfony/process": "^5.4.24",
+    "symfony/var-dumper": "^5.4.25",
+    "symfony/yaml": "^5.4.23",
+    "thecodingmachine/safe": "^2.5"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "*",
+    "pluswerk/grumphp-config": "^6.5",
+    "spatie/phpunit-watcher": "*"
   },
   "autoload": {
     "psr-4": {
@@ -29,8 +33,26 @@
       "Kanti\\LetsencryptClient\\Tests\\": "tests"
     }
   },
-  "require-dev": {
-    "phpunit/phpunit": "^8.1",
-    "spatie/phpunit-watcher": "^1.8"
+  "config": {
+    "allow-plugins": {
+      "phpro/grumphp": true,
+      "phpstan/extension-installer": true,
+      "pluswerk/grumphp-config": true,
+      "php-http/discovery": true,
+      "ergebnis/composer-normalize": true
+    },
+    "optimize-autoloader": true,
+    "platform": {
+      "php": "8.0"
+    },
+    "process-timeout": 0,
+    "sort-packages": true
+  },
+  "scripts": {
+    "post-update-cmd": [
+      "composer bump"
+    ],
+    "test": "./vendor/bin/phpunit tests",
+    "test:watch": "./vendor/bin/phpunit-watcher watch tests"
   }
 }

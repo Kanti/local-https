@@ -44,3 +44,8 @@ DNS_CLOUDFLARE_API_KEY=0123456789abcdefghijklmnopqrstuvwxyz
 # optional:
 SLACK_TOKEN=111111111/222222222/333333333333333333333333
 ````
+
+
+## local testing:
+
+``docker build -t kanti/local-https--build-arg RELEASE_TAG=$(git log --format="%H" -n 1) .``

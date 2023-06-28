@@ -1,29 +1,41 @@
 version: '3.5'
 services:
 
-  proxy:
-    restart: always
-    image: jwilder/nginx-proxy
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - ./.docker/data/nginx/certs:/etc/nginx/certs
-      - ./.docker/data/nginx/dhparam:/etc/nginx/dhparam
-    environment:
-      - DHPARAM_GENERATION=false
-    labels:
-      - com.github.kanti.local_https.nginx_proxy=true
+#  proxy:
+#    restart: unless-stopped
+#    image: nginxproxy/nginx-proxy
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    volumes:
+#      - /var/run/docker.sock:/tmp/docker.sock:ro
+#      - ./.docker/data/nginx/certs:/etc/nginx/certs
+#      - ./.docker/data/nginx/dhparam:/etc/nginx/dhparam
+#    environment:
+#      - DHPARAM_GENERATION=false
+#    labels:
+#      - com.github.kanti.local_https.nginx_proxy=true
 
   companion:
-    build: .
+    build:
+      context: .
+      args:
+        BUILD_STAGE: dev
+    stop_signal: SIGKILL
+    entrypoint: tail -f /dev/null
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./.docker/data/letsencrypt:/etc/letsencrypt
       - ./.docker/data/nginx/certs:/etc/nginx/certs
+      - .:/app
     environment:
       - DNS_CLOUDFLARE_EMAIL=${DNS_CLOUDFLARE_EMAIL:?must be set}
       - DNS_CLOUDFLARE_API_KEY=${DNS_CLOUDFLARE_API_KEY:?must be set}
       - HTTPS_MAIN_DOMAIN=${HTTPS_MAIN_DOMAIN:?must be set}
       - SLACK_TOKEN=${SLACK_TOKEN:-}
+      - SENTRY_DSN=${SENTRY_DSN:?must be set}
+
+networks:
+  default:
+    name: global
+    external: true
