@@ -52,6 +52,9 @@ final class CleanupHelper
         $this->output->writeln(sprintf('deleteInvalidCertificatesInNginxDir (%s)...', $mainDomain));
         $finder = new Finder();
         $finder->files()->in('/etc/nginx/certs/')->name('*.crt');
+
+        $somethingChanged = false;
+
         foreach ($finder as $file) {
             $domainString = $file->getBasename('.crt');
 
@@ -60,6 +63,7 @@ final class CleanupHelper
             } catch (InvalidDomainException) {
                 $this->output->writeln(sprintf('<error>remove Certificate from  (InvalidDomainException) <options=bold> %s</></error>', $domainString));
                 unlink($file->getPathname());
+                $somethingChanged = true;
                 continue;
             }
 
@@ -73,6 +77,7 @@ final class CleanupHelper
 
             $this->output->writeln(sprintf('<error>remove Certificate from nginx<options=bold> %s</></error>', $domainString));
             unlink($file->getPathname());
+            $somethingChanged = true;
         }
 
         foreach ($finder->files()->in('/etc/nginx/certs/')->name('*.key') as $keyFile) {
@@ -83,9 +88,13 @@ final class CleanupHelper
             }
 
             unlink($keyFile->getPathname());
+            $somethingChanged = true;
         }
 
-        $this->nginxProxy->restart();
+        if ($somethingChanged) {
+            $this->nginxProxy->restart();
+        }
+
         $this->output->writeln('...deleteInvalidCertificatesInNginxDir DONE');
     }
 }
