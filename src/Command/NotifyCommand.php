@@ -5,6 +5,7 @@ namespace Kanti\LetsencryptClient\Command;
 use Kanti\LetsencryptClient\Certificate\CertChecker;
 use Kanti\LetsencryptClient\Dto\Domain;
 use Kanti\LetsencryptClient\Dto\LetsEncryptCertificate;
+use Kanti\LetsencryptClient\Helper\HostsFileHelper;
 use Kanti\LetsencryptClient\Helper\WildCardHelper;
 use Kanti\LetsencryptClient\Utility\ConfigUtility;
 use Kanti\LetsencryptClient\Helper\DataJsonReader;
@@ -25,7 +26,8 @@ class NotifyCommand extends Command
         private NginxProxy $nginxProxy,
         private CleanupHelper $cleanupHelper,
         private DataJsonReader $dataJsonReader,
-        private WildCardHelper $wildCardHelper
+        private WildCardHelper $wildCardHelper,
+        private HostsFileHelper $hostsFileHelper,
     ) {
         parent::__construct();
     }
@@ -46,6 +48,8 @@ class NotifyCommand extends Command
         $this->cleanupHelper->deleteOldCertificatesFromCertbot();
 
         $domainLists = $this->dataJsonReader->getDomainList($mainDomain, 'var/data.json');
+
+        $this->hostsFileHelper->updateHostsFiles($domainLists);
 
         foreach ($domainLists->getWildCardDomainList() as $domain) {
             $wildCardCert = $this->wildCardHelper->createOrUpdate($domain);

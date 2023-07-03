@@ -34,14 +34,12 @@ class EntrypointCommand extends Command
         $this->cleanupHelper->deleteInvalidCertificatesInNginxDir($mainDomain);
         $this->cleanupHelper->deleteOldCertificatesFromCertbot();
 
-        $email = ConfigUtility::getEnv('DNS_CLOUDFLARE_EMAIL');
-        $apiKey = ConfigUtility::getEnv('DNS_CLOUDFLARE_API_KEY');
+        $apiToken = ConfigUtility::getEnv('DNS_CLOUDFLARE_API_TOKEN');
 
         ProcessUtility::runProcess('mkdir -p var');
 
         $lines = [];
-        $lines[] = 'dns_cloudflare_email=' . $email;
-        $lines[] = 'dns_cloudflare_api_key=' . $apiKey;
+        $lines[] = 'dns_cloudflare_api_token=' . $apiToken;
         file_put_contents('var/cloudflare.ini', implode(PHP_EOL, $lines));
         ProcessUtility::runProcess('chmod 0700 var/cloudflare.ini');
 

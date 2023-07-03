@@ -23,14 +23,16 @@ services:
         BUILD_STAGE: dev
     stop_signal: SIGKILL
     entrypoint: tail -f /dev/null
+    network_mode: host
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./.docker/data/letsencrypt:/etc/letsencrypt
       - ./.docker/data/nginx/certs:/etc/nginx/certs
       - .:/app
+      - /etc/hosts:/wsl-hosts-file/hosts
+      - /home/user/www/global/.docker/data/windows-hosts-file:/windows-hosts-file/
     environment:
-      - DNS_CLOUDFLARE_EMAIL=${DNS_CLOUDFLARE_EMAIL:?must be set}
-      - DNS_CLOUDFLARE_API_KEY=${DNS_CLOUDFLARE_API_KEY:?must be set}
+      - DNS_CLOUDFLARE_API_TOKEN=${DNS_CLOUDFLARE_API_TOKEN:?must be set}
       - HTTPS_MAIN_DOMAIN=${HTTPS_MAIN_DOMAIN:?must be set}
       - SLACK_TOKEN=${SLACK_TOKEN:-}
       - SENTRY_DSN=${SENTRY_DSN:?must be set}

@@ -77,6 +77,6 @@ ENV RELEASE_TAG=${RELEASE_TAG}
 
 ENTRYPOINT ["/app/s", "entrypoint"]
 
-CMD ["docker-gen --watch --interval 60 --notify-output --notify './s'  templates/data.tmpl var/data.json"]
+CMD ["docker-gen --watch --interval 60 --notify-output --notify './s' templates/data.tmpl var/data.json"]
 
 

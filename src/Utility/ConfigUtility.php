@@ -8,9 +8,9 @@ use Exception;
 
 final class ConfigUtility
 {
-    public static function getEnv(string $key): string
+    public static function getEnv(string $key, string $fallback = ''): string
     {
-        $env = getenv($key);
+        $env = getenv($key) ?: $fallback;
         if (empty($env)) {
             throw new Exception(sprintf('ENVIRONMENT variable %s must be set.', $key));
         }

@@ -6,6 +6,9 @@ use Kanti\LetsencryptClient\Certificate\CertificateWithDomainCheck;
 use Kanti\LetsencryptClient\Certificate\CertbotHelper;
 use Kanti\LetsencryptClient\Dto\Domain;
 use Kanti\LetsencryptClient\Dto\WildCardCert;
+use Kanti\LetsencryptClient\Exception\CertbotException;
+use Kanti\LetsencryptClient\Utility\ConfigUtility;
+use Kanti\LetsencryptClient\Utility\ProcessUtility;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class WildCardHelper
