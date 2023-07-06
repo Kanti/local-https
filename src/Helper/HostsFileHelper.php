@@ -9,7 +9,7 @@ use Kanti\LetsencryptClient\Dto\HostsFile;
 use Kanti\LetsencryptClient\Utility\ConfigUtility;
 use Kanti\LetsencryptClient\Utility\ProcessUtility;
 
-class HostsFileHelper
+final class HostsFileHelper
 {
     public function updateHostsFiles(DomainList $domainList): void
     {
@@ -18,10 +18,12 @@ class HostsFileHelper
             return;
         }
 
+        $vmIp = null;
+
         if (file_exists('/wsl-hosts-file/hosts')) {
             $hostsFile = new HostsFile('/wsl-hosts-file/hosts');
 
-            $vmIp = trim(ProcessUtility::runProcess('ip addr show ' . $networkName . ' | grep "inet\b" | awk \'{print $2}\' | cut -d/ -f1')->getOutput());
+            $vmIp = $this->getVmIp($networkName);
 
             foreach ($domainList as $domain) {
                 $hostsFile->addOrReplaceDomain($domain, $vmIp);
@@ -32,11 +34,19 @@ class HostsFileHelper
 
         if (file_exists('/windows-hosts-file/hosts')) {
             $hostsFile = new HostsFile('/windows-hosts-file/hosts');
+
+            $vmIp ??= $this->getVmIp($networkName);
+
             foreach ($domainList as $domain) {
-                $hostsFile->addOrReplaceDomain($domain, '127.0.0.1');
+                $hostsFile->addOrReplaceDomain($domain, $vmIp);
             }
 
             $hostsFile->write();
         }
+    }
+
+    private function getVmIp(string $networkName): string
+    {
+        return trim(ProcessUtility::runProcess('ip addr show ' . $networkName . ' | grep "inet\b" | awk \'{print $2}\' | cut -d/ -f1')->getOutput());
     }
 }
