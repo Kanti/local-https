@@ -6,12 +6,13 @@ namespace Kanti\LetsencryptClient\Helper;
 
 use Kanti\LetsencryptClient\Dto\DomainList;
 use Kanti\LetsencryptClient\Dto\HostsFile;
+use Symfony\Component\Console\Output\OutputInterface;
 use Kanti\LetsencryptClient\Utility\ConfigUtility;
 use Kanti\LetsencryptClient\Utility\ProcessUtility;
 
 final class HostsFileHelper
 {
-    public function updateHostsFiles(DomainList $domainList): void
+    public function updateHostsFiles(DomainList $domainList, OutputInterface $output): void
     {
         $networkName = ConfigUtility::getEnv('DDNS_INTERFACE', 'eth0');
         if ($networkName === 'off') {
@@ -24,6 +25,10 @@ final class HostsFileHelper
             $hostsFile = new HostsFile('/wsl-hosts-file/hosts');
 
             $vmIp = $this->getVmIp($networkName);
+            if (!$vmIp) {
+                $output->writeln('<warning>could not find vmIp for network ' . $networkName . ' (to disable this Feature use DDNS_INTERFACE=off)</warning>');
+                return;
+            }
 
             foreach ($domainList as $domain) {
                 $hostsFile->addOrReplaceDomain($domain, $vmIp);
@@ -36,6 +41,10 @@ final class HostsFileHelper
             $hostsFile = new HostsFile('/windows-hosts-file/hosts');
 
             $vmIp ??= $this->getVmIp($networkName);
+            if (!$vmIp) {
+                $output->writeln('<warning>could not find vmIp for network ' . $networkName . ' (to disable this Feature use DDNS_INTERFACE=off)</warning>');
+                return;
+            }
 
             foreach ($domainList as $domain) {
                 $hostsFile->addOrReplaceDomain($domain, $vmIp);

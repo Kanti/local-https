@@ -49,7 +49,7 @@ class NotifyCommand extends Command
 
         $domainLists = $this->dataJsonReader->getDomainList($mainDomain, 'var/data.json');
 
-        $this->hostsFileHelper->updateHostsFiles($domainLists);
+        $this->hostsFileHelper->updateHostsFiles($domainLists, $output);
 
         foreach ($domainLists->getWildCardDomainList() as $domain) {
             $wildCardCert = $this->wildCardHelper->createOrUpdate($domain);
