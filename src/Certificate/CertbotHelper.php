@@ -16,7 +16,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use function Sentry\captureMessage;
 use function sprintf;
 
-final class CertbotHelper
+final readonly class CertbotHelper
 {
     public function __construct(private OutputInterface $output, private SlackNotification $slackNotification)
     {

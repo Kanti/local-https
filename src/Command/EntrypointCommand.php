@@ -17,8 +17,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'entrypoint')]
 class EntrypointCommand extends Command
 {
-    public function __construct(private CleanupHelper $cleanupHelper, private WildCardHelper $wildCardHelper, private NginxProxy $nginxProxy)
-    {
+    public function __construct(
+        private readonly CleanupHelper $cleanupHelper,
+        private readonly WildCardHelper $wildCardHelper,
+        private readonly NginxProxy $nginxProxy,
+    ) {
         parent::__construct();
     }
 

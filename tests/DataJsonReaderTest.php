@@ -10,6 +10,8 @@ use Kanti\LetsencryptClient\Application;
 use Kanti\LetsencryptClient\Dto\Domain;
 use Kanti\LetsencryptClient\Dto\DomainList;
 use Kanti\LetsencryptClient\Helper\DataJsonReader;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Output\NullOutput;
@@ -17,10 +19,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DataJsonReaderTest extends TestCase
 {
-    /**
-     * @dataProvider getProjectDomainsProvider
-     */
-    public function testGetProjectDomains(string $httpsMainDomain, string $dataFilePath, DomainList $expectedList): void
+    #[Test]
+    #[DataProvider('getProjectDomainsProvider')]
+    public function getProjectDomains(string $httpsMainDomain, string $dataFilePath, DomainList $expectedList): void
     {
         self::setupApplicationContainer();
         $dataJsonReader = new DataJsonReader(new NullOutput());
@@ -28,7 +29,7 @@ class DataJsonReaderTest extends TestCase
         self::assertEquals($expectedList, $result);
     }
 
-    public function getProjectDomainsProvider(): Generator
+    public static function getProjectDomainsProvider(): Generator
     {
         yield ['kanti.dev', 'tests/fixtures/domainList.json', DomainList::fromArray([
             'kanti.dev',

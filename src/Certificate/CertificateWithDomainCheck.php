@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use function sprintf;
 
-final class CertificateWithDomainCheck
+final readonly class CertificateWithDomainCheck
 {
     public function __construct(private OutputInterface $output)
     {
@@ -50,10 +50,8 @@ final class CertificateWithDomainCheck
         if ($result) {
             $lines = explode(PHP_EOL, $result);
             $dnsEntries = explode(',', $lines[1]);
-            $dnsEntries = array_map('\trim', $dnsEntries);
-            /** @var string[] $acceptedDomains */
+            $dnsEntries = array_map(\trim(...), $dnsEntries);
             $acceptedDomains = str_replace('DNS:', '', $dnsEntries);
-            assert(is_array($acceptedDomains));
         }
 
         $acceptedDomains[] = $acceptedDomain;
@@ -68,7 +66,6 @@ final class CertificateWithDomainCheck
         }
 
         $result = ProcessUtility::runProcess(sprintf('openssl x509 -noout -enddate -in "%s" | cut -d "=" -f 2', $certPathAndName . '.crt'))->getOutput();
-        assert(is_string($result));
         $certDate = new DateTimeImmutable($result);
         if ($certDate < new DateTimeImmutable('+1 week')) {
             $this->output->writeln('Certificate is not valid in 1 week from now');
