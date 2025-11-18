@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use function Safe\json_encode;
 
-final class SlackNotification
+final readonly class SlackNotification
 {
     public function __construct(private OutputInterface $output)
     {

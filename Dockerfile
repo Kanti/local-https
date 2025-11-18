@@ -1,6 +1,6 @@
 ARG BUILD_STAGE=prod
 
-FROM certbot/dns-cloudflare:v2.5.0 as base
+FROM certbot/dns-cloudflare:v5.0.0 AS base
 
 RUN wget https://github.com/nginx-proxy/docker-gen/releases/download/0.10.4/docker-gen-alpine-linux-amd64-0.10.4.tar.gz && \
   tar xvzf docker-gen-alpine-linux-amd64-0.10.4.tar.gz && \
@@ -19,21 +19,21 @@ RUN apk add --update curl \
 #
 # dev
 #
-FROM base as dev
+FROM base AS dev
 
 RUN apk add --update \
-    php8 \
-    php8-json \
-    php8-pecl-yaml \
-    php8-curl \
-    php8-dom \
-    php8-pdo \
-    php8-simplexml \
-    php8-tokenizer \
-    php8-xml \
-    php8-xmlwriter \
-    php8-posix \
-    php8-ctype \
+    php83 \
+    php83-json \
+    php83-pecl-yaml \
+    php83-curl \
+    php83-dom \
+    php83-pdo \
+    php83-simplexml \
+    php83-tokenizer \
+    php83-xml \
+    php83-xmlwriter \
+    php83-posix \
+    php83-ctype \
     file \
     composer \
     git \
@@ -47,13 +47,13 @@ RUN git config --global --add safe.directory /app
 #
 # prod
 #
-FROM base as prod
+FROM base AS prod
 
 RUN apk add --update \
-    php8 \
-    php8-json \
-    php8-pecl-yaml \
-    php8-curl \
+    php83 \
+    php83-json \
+    php83-pecl-yaml \
+    php83-curl \
     composer \
   && rm -rf /var/cache/apk/*
 
@@ -61,7 +61,7 @@ RUN apk add --update \
 # finish
 #
 
-FROM ${BUILD_STAGE} as finish
+FROM ${BUILD_STAGE} AS finish
 
 COPY src /app/src
 COPY templates /app/templates
@@ -78,5 +78,3 @@ ENV RELEASE_TAG=${RELEASE_TAG}
 ENTRYPOINT ["/app/s", "entrypoint"]
 
 CMD ["docker-gen --watch --interval 60 --notify-output --notify './s' templates/data.tmpl var/data.json"]
-
-

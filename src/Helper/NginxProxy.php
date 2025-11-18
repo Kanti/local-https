@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use function sprintf;
 
-final class NginxProxy
+final readonly class NginxProxy
 {
     private string $dockerGenContainer;
 

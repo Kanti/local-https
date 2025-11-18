@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use function Safe\file_get_contents;
 use function Safe\json_decode;
 
-final class DataJsonReader
+final readonly class DataJsonReader
 {
     public function __construct(private OutputInterface $output)
     {

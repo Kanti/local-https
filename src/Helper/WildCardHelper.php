@@ -14,9 +14,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 class WildCardHelper
 {
     public function __construct(
-        private CertificateWithDomainCheck $certificateWithDomainCheck,
-        private OutputInterface $output,
-        private CertbotHelper $certbotHelper
+        private readonly CertificateWithDomainCheck $certificateWithDomainCheck,
+        private readonly OutputInterface $output,
+        private readonly CertbotHelper $certbotHelper
     ) {
     }
 

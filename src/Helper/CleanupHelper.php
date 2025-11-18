@@ -15,7 +15,7 @@ use Symfony\Component\Finder\Finder;
 
 use function Safe\preg_replace;
 
-final class CleanupHelper
+final readonly class CleanupHelper
 {
     public function __construct(
         private CertbotHelper $certbotHelper,
@@ -30,7 +30,12 @@ final class CleanupHelper
         $this->output->writeln('deleteOldCertificatesFromCertbot...');
         $data = $this->certbotHelper->getCurrentCertificateInformation();
         foreach ($data['Found the following certs'] ?? [] as $name => $certInfo) {
-            preg_match('#(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})#', $certInfo['Expiry Date'], $matches);
+            preg_match('#(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})#', (string) $certInfo['Expiry Date'], $matches);
+            if (!isset($matches[0])) {
+                $this->output->writeln('<error>ERROR: Expiry Date not valid format</error>');
+                continue;
+            }
+
             $certDate = new DateTimeImmutable($matches[0]);
             if ($certDate < new DateTimeImmutable('-1 month')) {
                 $this->certbotHelper->removeCertificate($name);

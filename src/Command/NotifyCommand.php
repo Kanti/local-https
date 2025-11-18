@@ -23,11 +23,11 @@ use Symfony\Component\Lock\Store\FlockStore;
 class NotifyCommand extends Command
 {
     public function __construct(
-        private NginxProxy $nginxProxy,
-        private CleanupHelper $cleanupHelper,
-        private DataJsonReader $dataJsonReader,
-        private WildCardHelper $wildCardHelper,
-        private HostsFileHelper $hostsFileHelper,
+        private readonly NginxProxy $nginxProxy,
+        private readonly CleanupHelper $cleanupHelper,
+        private readonly DataJsonReader $dataJsonReader,
+        private readonly WildCardHelper $wildCardHelper,
+        private readonly HostsFileHelper $hostsFileHelper,
     ) {
         parent::__construct();
     }

@@ -5,12 +5,9 @@ namespace Kanti\LetsencryptClient\Dto;
 use Kanti\LetsencryptClient\Exception\InvalidDomainException;
 use Stringable;
 
-class Domain implements Stringable
+final readonly class Domain implements Stringable
 {
-    /**
-     * @var string
-     */
-    public const VALIDATION_REGEX = '/^([a-z0-9]+[a-z0-9-.]+[a-z0-9]+)$/';
+    public const string VALIDATION_REGEX = '/^([a-z0-9]+[a-z0-9-.]+[a-z0-9]+)$/';
 
     public function __construct(private string $domainString)
     {

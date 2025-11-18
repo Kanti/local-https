@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Kanti\LetsencryptClient\Dto;
 
-final class WildCardCert
+final readonly class WildCardCert
 {
     public function __construct(private string $crtPath, private string $keyPath, private Domain $domain)
     {

@@ -12,9 +12,9 @@ final class HostsFile
     private array $lines = [];
 
     /** @var string[]  */
-    private array $initalLines = [];
+    private array $initialLines = [];
 
-    public function __construct(private string $filePath)
+    public function __construct(private readonly string $filePath)
     {
         if (!is_file($this->filePath) || !is_readable($this->filePath)) {
             throw new Exception(sprintf('Unable to read file: %s', $filePath));
@@ -22,7 +22,7 @@ final class HostsFile
 
         $content = file_get_contents($this->filePath);
         $this->lines = explode("\n", $content);
-        $this->initalLines = explode("\n", $content);
+        $this->initialLines = explode("\n", $content);
     }
 
     public function addOrReplaceDomain(Domain $domain, string $ip): void
@@ -30,6 +30,10 @@ final class HostsFile
         foreach ($this->lines as &$line) {
             preg_match('#^\s*(?<ip>\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})\s+(?<domain>[^\s]+)\s*$#', $line, $matches);
             if (($matches['domain'] ?? '') !== (string)$domain) {
+                continue;
+            }
+
+            if (!isset($matches['ip'])) {
                 continue;
             }
 
@@ -43,7 +47,7 @@ final class HostsFile
 
     public function write(): void
     {
-        if ($this->lines === $this->initalLines) {
+        if ($this->lines === $this->initialLines) {
             return;
         }
 
