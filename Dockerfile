@@ -1,16 +1,20 @@
 ARG BUILD_STAGE=prod
 
-FROM certbot/dns-cloudflare:v5.0.0 AS base
+FROM certbot/dns-cloudflare:v5.1.0 AS base
+# find version here: https://releasealert.dev/dockerhub/_/docker
+ARG DOCKER_VERSION=29.0.4
+# find version here: https://github.com/nginx-proxy/docker-gen/releases
+ARG DOCKER_GEN_VERSION=0.16.1
 
-RUN wget https://github.com/nginx-proxy/docker-gen/releases/download/0.10.4/docker-gen-alpine-linux-amd64-0.10.4.tar.gz && \
-  tar xvzf docker-gen-alpine-linux-amd64-0.10.4.tar.gz && \
-  rm docker-gen-alpine-linux-amd64-0.10.4.tar.gz && \
+RUN wget https://github.com/nginx-proxy/docker-gen/releases/download/${DOCKER_GEN_VERSION}/docker-gen-alpine-linux-amd64-${DOCKER_GEN_VERSION}.tar.gz && \
+  tar xvzf docker-gen-alpine-linux-amd64-${DOCKER_GEN_VERSION}.tar.gz && \
+  rm docker-gen-alpine-linux-amd64-${DOCKER_GEN_VERSION}.tar.gz && \
   mv docker-gen /usr/bin/ && \
   chmod +x /usr/bin/docker-gen
 
 RUN apk add --update curl \
     && mkdir -p /tmp/download \
-    && curl -L "https://download.docker.com/linux/static/stable/x86_64/docker-23.0.4.tgz" | tar -xz -C /tmp/download \
+    && curl -L "https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz" | tar -xz -C /tmp/download \
     && mv /tmp/download/docker/docker /usr/local/bin/ \
     && rm -rf /tmp/download \
     && apk del curl \
