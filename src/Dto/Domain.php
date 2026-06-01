@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kanti\LetsencryptClient\Dto;
 
 use Kanti\LetsencryptClient\Exception\InvalidDomainException;

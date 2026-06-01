@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kanti\LetsencryptClient\Command;
 
 use Kanti\LetsencryptClient\Certificate\CertChecker;
