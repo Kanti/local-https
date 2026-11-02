@@ -20,9 +20,6 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\ErrorHandler\ErrorHandler;
 
-use function Sentry\captureException;
-use function Sentry\init;
-
 class Application extends SymfonyApplication
 {
     public static ContainerInterface $container;
@@ -30,15 +27,6 @@ class Application extends SymfonyApplication
     public function __construct()
     {
         ErrorHandler::register();
-
-        $dsn = getenv('SENTRY_DSN');
-        if ($dsn) {
-            echo sprintf('SENTRY INITIALISED with dsn %s' . PHP_EOL, $dsn);
-            init([
-                'dsn' => $dsn,
-                'release' => getenv('RELEASE_TAG'),
-            ]);
-        }
 
         parent::__construct();
 
@@ -72,7 +60,6 @@ class Application extends SymfonyApplication
             $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
 
             $this->renderThrowable($throwable, $output);
-            captureException($throwable);
 
             if ($throwable instanceof CertbotException) {
                 $logPath = '/var/log/letsencrypt/letsencrypt.log';

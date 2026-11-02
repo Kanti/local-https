@@ -13,7 +13,6 @@ use Kanti\LetsencryptClient\Utility\ProcessUtility;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
-use function Sentry\captureMessage;
 use function sprintf;
 
 final readonly class CertbotHelper
@@ -93,7 +92,5 @@ final readonly class CertbotHelper
             $this->output->writeln(sprintf('Certificate for *.%s renewed.', $domain));
             $this->slackNotification->sendNotification(sprintf(':recycle:CERTIFICATE renewed for <https://%s|*.%s>', $domain, $domain));
         }
-
-        captureMessage('notifyUser without specific message' . PHP_EOL . $result);
     }
 }

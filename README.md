@@ -35,7 +35,6 @@ services:
       - HTTPS_MAIN_DOMAIN=${HTTPS_MAIN_DOMAIN:?must be set}
       - DDNS_INTERFACE=${DDNS_INTERFACE:-eth0}
       - SLACK_TOKEN=${SLACK_TOKEN:-}
-      - SENTRY_DSN=${SENTRY_DSN:-}
 ````
 
 ## get an Cloudflare api token
@@ -62,7 +61,6 @@ DNS_CLOUDFLARE_API_TOKEN=_aA_AaBbCc12GgHh34_HX77AbCdEf9_23FgHtZax
 
 # optional:
 SLACK_TOKEN=111111111/222222222/333333333333333333333333
-SENTRY_DSN=https://0123456789abcdefghijklmnopqrstuvwxyz@sentry.com/123456
 ````
 
 
