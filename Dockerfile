@@ -26,18 +26,18 @@ RUN apk add --update curl \
 FROM base AS dev
 
 RUN apk add --update \
-    php83 \
-    php83-json \
-    php83-pecl-yaml \
-    php83-curl \
-    php83-dom \
-    php83-pdo \
-    php83-simplexml \
-    php83-tokenizer \
-    php83-xml \
-    php83-xmlwriter \
-    php83-posix \
-    php83-ctype \
+    php84 \
+    php84-json \
+    php84-pecl-yaml \
+    php84-curl \
+    php84-dom \
+    php84-pdo \
+    php84-simplexml \
+    php84-tokenizer \
+    php84-xml \
+    php84-xmlwriter \
+    php84-posix \
+    php84-ctype \
     file \
     composer \
     git \
@@ -54,10 +54,10 @@ RUN git config --global --add safe.directory /app
 FROM base AS prod
 
 RUN apk add --update \
-    php83 \
-    php83-json \
-    php83-pecl-yaml \
-    php83-curl \
+    php84 \
+    php84-json \
+    php84-pecl-yaml \
+    php84-curl \
     composer \
   && rm -rf /var/cache/apk/*
 
