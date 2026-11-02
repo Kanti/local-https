@@ -2,8 +2,9 @@ name: ci
 
 on:
   schedule:
-    # build every first of the month
-    - cron: '0 0 1 * *'
+    # build daily so the image picks up updated system packages
+    # (off the full hour, scheduled runs at :00 are often delayed)
+    - cron: '17 3 * * *'
   push:
   workflow_dispatch:
   pull_request:
