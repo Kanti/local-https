@@ -15,7 +15,7 @@
     "symfony/process": "^7.4.22",
     "symfony/var-dumper": "^7.4.22",
     "symfony/yaml": "^7.4.22",
-    "thecodingmachine/safe": "^2.5"
+    "thecodingmachine/safe": "^3.4"
   },
   "require-dev": {
     "phpunit/phpunit": ">=12.4.3",
