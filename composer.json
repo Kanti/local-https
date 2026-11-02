@@ -6,7 +6,6 @@
     "php": "~8.3.0",
     "ext-curl": "*",
     "ext-yaml": "*",
-    "sentry/sdk": "^3.6",
     "symfony/config": "^7.4.22",
     "symfony/console": "^7.4.22",
     "symfony/dependency-injection": "^7.4.22",
@@ -35,7 +34,6 @@
   "config": {
     "allow-plugins": {
       "ergebnis/composer-normalize": true,
-      "php-http/discovery": true,
       "phpro/grumphp": true,
       "phpstan/extension-installer": true,
       "pluswerk/grumphp-config": true

@@ -8,8 +8,6 @@ use Countable;
 use IteratorAggregate;
 use Traversable;
 
-use function Clue\StreamFilter\fun;
-
 /**
  * @implements IteratorAggregate<Domain>
  */
