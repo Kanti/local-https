@@ -34,7 +34,6 @@ services:
       - DNS_CLOUDFLARE_API_TOKEN=${DNS_CLOUDFLARE_API_TOKEN:?must be set}
       - HTTPS_MAIN_DOMAIN=${HTTPS_MAIN_DOMAIN:?must be set}
       - SLACK_TOKEN=${SLACK_TOKEN:-}
-      - SENTRY_DSN=${SENTRY_DSN:?must be set}
 
 networks:
   default:

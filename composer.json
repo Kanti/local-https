@@ -6,7 +6,6 @@
     "php": "~8.3.0",
     "ext-curl": "*",
     "ext-yaml": "*",
-    "sentry/sdk": "^3.6",
     "symfony/config": "^7.4.22",
     "symfony/console": "^7.4.22",
     "symfony/dependency-injection": "^7.4.22",
@@ -16,7 +15,7 @@
     "symfony/process": "^7.4.22",
     "symfony/var-dumper": "^7.4.22",
     "symfony/yaml": "^7.4.22",
-    "thecodingmachine/safe": "^2.5"
+    "thecodingmachine/safe": "^3.4"
   },
   "require-dev": {
     "phpunit/phpunit": ">=12.4.3",
@@ -35,7 +34,6 @@
   "config": {
     "allow-plugins": {
       "ergebnis/composer-normalize": true,
-      "php-http/discovery": true,
       "phpro/grumphp": true,
       "phpstan/extension-installer": true,
       "pluswerk/grumphp-config": true
