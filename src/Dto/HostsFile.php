@@ -12,7 +12,7 @@ final class HostsFile
     private array $lines = [];
 
     /** @var string[]  */
-    private array $initialLines = [];
+    private readonly array $initialLines;
 
     public function __construct(private readonly string $filePath)
     {
