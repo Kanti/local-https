@@ -63,7 +63,7 @@ class DomainList implements IteratorAggregate, Countable, Stringable
     public static function fromArray(array $domainStrings): DomainList
     {
         $domains = array_map(static fn(string $domain): Domain => new Domain($domain), $domainStrings);
-        return (new self(...$domains))->sort();
+        return new self(...$domains)->sort();
     }
 
     public function getWildCardDomainList(): DomainList

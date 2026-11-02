@@ -70,6 +70,6 @@ class NotifyCommand extends Command
 
     public function lock(): LockInterface
     {
-        return (new LockFactory(new FlockStore()))->createLock('notify-cmd-execution');
+        return new LockFactory(new FlockStore())->createLock('notify-cmd-execution');
     }
 }
