@@ -61,8 +61,8 @@ class Application extends SymfonyApplication
 
         self::$container = $container;
 
-        $this->add($container->get(EntrypointCommand::class));
-        $this->add($container->get(NotifyCommand::class));
+        $this->addCommand($container->get(EntrypointCommand::class));
+        $this->addCommand($container->get(NotifyCommand::class));
         $this->setDefaultCommand('notify');
 
         $this->setCatchExceptions(false);

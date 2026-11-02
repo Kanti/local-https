@@ -55,7 +55,7 @@ class DataJsonReaderTest extends TestCase
     public static function setupApplicationContainer(): void
     {
         Application::$container = new class implements ContainerInterface {
-            public function get(string $id)
+            public function get(string $id): mixed
             {
                 return match ($id) {
                     OutputInterface::class => new NullOutput(),
@@ -63,7 +63,7 @@ class DataJsonReaderTest extends TestCase
                 };
             }
 
-            public function has(string $id)
+            public function has(string $id): bool
             {
                 try {
                     $this->get($id);
