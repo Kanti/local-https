@@ -1,6 +1,6 @@
 ARG BUILD_STAGE=prod
 
-FROM certbot/dns-cloudflare:v5.1.0 AS base
+FROM certbot/dns-cloudflare:v5.9.0 AS base
 # find version here: https://releasealert.dev/dockerhub/_/docker
 ARG DOCKER_VERSION=29.0.4
 # find version here: https://github.com/nginx-proxy/docker-gen/releases
