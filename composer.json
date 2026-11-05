@@ -6,7 +6,7 @@
     "php": "~8.4.0",
     "ext-curl": "*",
     "ext-yaml": "*",
-    "symfony/config": "^7.4.22",
+    "symfony/config": "^7.4.23",
     "symfony/console": "^7.4.22",
     "symfony/dependency-injection": "^7.4.22",
     "symfony/error-handler": "^7.4.22",
@@ -14,7 +14,7 @@
     "symfony/lock": "^7.4.22",
     "symfony/process": "^7.4.22",
     "symfony/var-dumper": "^7.4.22",
-    "symfony/yaml": "^7.4.22",
+    "symfony/yaml": "^7.4.23",
     "thecodingmachine/safe": "^3.4"
   },
   "require-dev": {
